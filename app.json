@@ -10,6 +10,7 @@
     "backgroundTextStyle":"light",
     "navigationBarBackgroundColor": "#f8f8f8",
     "navigationBarTitleText": "考证通在线",
-    "navigationBarTextStyle":"black"
+    "navigationBarTextStyle":"black",
+    "backgroundColor": "#f8f8f8"
   }
 }

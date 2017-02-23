@@ -1,4 +1,5 @@
 var request = require('../../utils/request').request;
+var attachAns = require('../../utils/util').attachAns;
 var pending = false;
 
 Page({
@@ -15,10 +16,10 @@ Page({
     doneMax: 0,
     done: 0,
     total: 0,
-    wrong: 0,
+    wrong: [],
     answer: [],
     right: false,
-    submitted: false
+    submitted: true
   },
   onLoad: function(option) {
     console.log(option);
@@ -26,20 +27,28 @@ Page({
 
     // 总题数
     var done = wx.getStorageSync('cnt_done_' + option.id);
+    var doneMax;
+    console.log(done, option.total);
     if (done) {
-      this.setData({ done: parseInt(done), doneMax: parseInt(done) });
+      done = parseInt(done);
+      doneMax = done;
+      // 全部完成时显示最后一题
+      if (done >= option.total) done = option.total-1;
     } else {
-      done = 0;
+      doneMax = done = 0;
     }
+    this.setData({ done: parseInt(done), doneMax: parseInt(doneMax) });
 
     // 错题数
     var wrong = wx.getStorageSync('cnt_wrong_' + option.id);
     if (wrong) {
-      this.setData({ wrong: parseInt(wrong) });
+      wrong = parseInt(wrong);
     } else {
       wrong = 0;
     }
+    this.setData({ wrong: parseInt(wrong) });
 
+    console.log(done);
     var that = this;
     request({
       url: `api/qbank/problem/${option.id}/${done}`,
@@ -52,11 +61,10 @@ Page({
           }
           return item;
         });
-
         if (res.length > 0) {
           that.setData({
             problems: res,
-            problem: res[0]
+            problem: attachAns.call(that, res[0])
           });
         } else {
           // TODO
@@ -65,9 +73,13 @@ Page({
     });
   },
   onUnload: function() {
-    console.log(this.data.wrong);
-    wx.setStorageSync('cnt_done_' + this.data.chapterId, this.data.done.toString());
+    var done = this.data.doneMax;
+    if (this.data.submitted) done++;
+    wx.setStorageSync('cnt_done_' + this.data.chapterId, done.toString());
     wx.setStorageSync('cnt_wrong_' + this.data.chapterId, this.data.wrong.toString());
+  },
+  onChange: function() {
+
   },
   checkboxChange: function(e) {
     this.setData({ answer: e.detail.value });
@@ -82,25 +94,34 @@ Page({
     if (answer1.toString() === answer2.toString()) {
       this.setData({ right: true });
     } else {
-      this.setData({ right: false });
+      this.setData({
+        right: false,
+        wrong: this.data.wrong + 1
+      });
     }
 
-    var submitted = this.data.submitted;
-    this.setData({ submitted: !submitted });
+    wx.setStorageSync('prob_ans_' + this.data.problem._id, JSON.stringify(answer1));
+
+    this.setData({ submitted: !this.data.submitted });
   },
   prev: function() {
     if (pending) return;
 
     var data = this.data;
+
+    if (data.done === 0) {
+      wx.showModal({ title: '提示', content: '已到达第一题' });
+      return;
+    }
+
     if (data.index > 0) {
-      this.setData({ problem: data.problems[data.index - 1] });
+      this.setData({
+        problem: attachAns.call(this, data.problems[data.index - 1]),
+        index: data.index - 1,
+        done: data.done - 1
+      });
     } else {
       // 获取题目
-      if (data.done === 0) {
-        wx.showModal({ title: '提示', content: '已到达第一题' });
-        return;
-      }
-
       pending = true;
       var that = this;
       request({
@@ -117,7 +138,7 @@ Page({
           if (res.length > 0) {
             that.setData({
               problems: [...res, ...data.problems],
-              problem: res[res.length - 1],
+              problem: attachAns.call(that, res[res.length - 1]),
               index: data.index + res.length - 1,
               done: data.done - 1
             });
@@ -129,30 +150,27 @@ Page({
         }
       });
     }
-    this.setData({
-      index: data.index - 1,
-      done: data.done - 1
-    });
   },
   next: function() {
     if (pending) return;
 
     var data = this.data;
 
-    if (data.done === data.doneMax && !data.right) {
-      this.setData({ wrong: data.wrong + 1 });
+    // 获取题目
+    if (data.done + 1 >= data.total) {
+      if (data.done + 1 === data.total) {
+        this.setData({
+          done: data.done + 1,
+          doneMax: data.doneMax > data.done + 1 ? data.doneMax : data.done + 1
+        });
+      }
+      wx.showModal({ title: '提示', content: '已到达最后一题' });
+      return;
     }
 
     if (data.problems.length > data.index + 1) {
-      this.setData({ problem: data.problems[data.index + 1] });
+      this.setData({ problem: attachAns.call(this, data.problems[data.index + 1]) });
     } else {
-      // 获取题目
-      if (data.done + 1 >= data.total) {
-        this.setData({  done: data.done + 1 });
-        wx.showModal({ title: '提示', content: '已到达最后一题' });
-        return;
-      }
-
       pending = true;
       var that = this;
 
@@ -170,7 +188,7 @@ Page({
           if (res.length > 0) {
             that.setData({
               problems: [...data.problems, ...res],
-              problem: res[0]
+              problem: attachAns.call(that, res[0])
             });
           } else {
             // TODO
@@ -181,7 +199,6 @@ Page({
     }
 
     this.setData({
-      submitted: !data.submitted,
       index: data.index + 1,
       done: data.done + 1,
       doneMax: data.doneMax > data.done + 1 ? data.doneMax : data.done + 1
