@@ -1,5 +1,5 @@
 function attachAns(problem) {
-  console.log(problem);
+  // console.log(problem);
   var ans = wx.getStorageSync('prob_ans_' + problem._id);
   if (ans) {
     ans = JSON.parse(ans);
@@ -12,7 +12,7 @@ function attachAns(problem) {
   } else {
     this.setData({ submitted: false });
   }
-  console.log(problem);
+  // console.log(problem);
   return problem;
 }
 

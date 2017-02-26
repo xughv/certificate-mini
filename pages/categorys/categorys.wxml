@@ -1,4 +1,4 @@
-<view class="container">
+<view class="category-container">
   <view>选择您要报考的证书</view>
   <picker-view indicator-style="height: 50px;" class="picker" value="{{value}}" bindchange="handlePickerChange">
     <picker-view-column>

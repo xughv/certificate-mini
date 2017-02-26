@@ -7,7 +7,6 @@
 }
 
 .category-link {
-  font-size: 14px;
   color: #47c577;
   float: right;
 }
@@ -29,13 +28,18 @@
   border: 1px solid #aaa;
 }
 
-.userinfo-nickname {
-  color: #aaa;
+.title {
+  font-size: 22px;
+  margin-top: 2px;
+  color: #888;
+  padding: 2px 8px;
+  border-bottom: 3px solid #47c577;
 }
 
 .wrong-button {
-  margin-top: 12px;
-  margin-bottom: 4px;
+  margin-top: 14px;
+  margin-bottom: 2px;
+  color: #888;
 }
 
 .chapter-container {
@@ -46,6 +50,7 @@
   border-bottom: 1px solid #d9d9d9;
   background-color: #fff;
   box-sizing: border-box;
+  border-left: 8px solid #47c577;
 }
 
 .chapter-name {

@@ -3,6 +3,7 @@ var request = require('../../utils/request').request;
 var app = getApp()
 Page({
   data: {
+    title: '',
     userInfo: {},
     chapters: []
   },
@@ -15,6 +16,8 @@ Page({
       });
       return;
     }
+
+    this.setData({ title: category.name });
 
     var that = this;
     //调用应用实例的方法获取全局数据

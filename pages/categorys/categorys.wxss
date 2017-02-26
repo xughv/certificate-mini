@@ -1,3 +1,10 @@
+.category-container {
+  height: 100%;
+  /*width: 100%;*/
+  text-align: center;
+  padding: 60rpx 0;
+  box-sizing: border-box;
+}
 
 .picker {
   border-top: 1px solid #d9d9d9;
