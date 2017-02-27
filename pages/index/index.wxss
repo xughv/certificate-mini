@@ -21,8 +21,8 @@
 }
 
 .userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
+  width: 132rpx;
+  height: 132rpx;
   margin: 20rpx;
   border-radius: 50%;
   border: 1px solid #aaa;
@@ -40,6 +40,7 @@
   margin-top: 14px;
   margin-bottom: 2px;
   color: #888;
+  padding: 0 14px!important;
 }
 
 .chapter-container {

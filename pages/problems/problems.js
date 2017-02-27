@@ -2,11 +2,11 @@ var request = require('../../utils/request').request;
 var attachAns = require('../../utils/util').attachAns;
 var WrongRecord = require('../../utils/wrong-record');
 var pending = false, submitted = false;
-var index = 0, doneMax = 0;
+var index = 0, doneMax = 0, answer = [], chapter = {};
+var app = getApp();
 
 Page({
   data: {
-    chapterId: null,
     problems: [],
     problem: {
       problem: "",
@@ -18,31 +18,35 @@ Page({
     done: 0,
     total: 0,
     wrong: 0,
-    answer: [],
     // 答案是否正确
     right: false,
     // 是否提交题目
     submitted: false
   },
-  onLoad: function(option) {
-    console.log(option);
-    this.setData({ chapterId: option.id, total: option.total });
+  onLoad: function() {
+    // var category = app.getCategory();
+    chapter = app.getChapter();
+    // console.log(chapter);
+    wx.setNavigationBarTitle({
+      title: chapter.name
+    })
+    this.setData({ total: chapter.count });
 
     // 获取完成题数
-    var done = wx.getStorageSync('cnt_done_' + option.id);
-    // console.log(done, option.total);
+    var done = wx.getStorageSync('cnt_done_' + chapter._id);
+    // console.log(done, chapter.count);
     if (done) {
       done = parseInt(done);
       doneMax = done;
       // 全部完成时显示最后一题
-      if (done >= option.total) done = option.total-1;
+      if (done >= chapter.count) done = chapter.count-1;
     } else {
       doneMax = done = 0;
     }
     this.setData({ done: parseInt(done) });
 
     // 获取错题数
-    var wrong = wx.getStorageSync('cnt_wrong_' + option.id);
+    var wrong = wx.getStorageSync('cnt_wrong_' + chapter._id);
     if (wrong) {
       wrong = parseInt(wrong);
     } else {
@@ -53,7 +57,7 @@ Page({
     // 从完成位置加载题目
     var that = this;
     request({
-      url: `api/qbank/problem/${option.id}/${done}`,
+      url: `api/qbank/problem/${chapter._id}/${done}`,
       success: function(res) {
         // 选项数据格式处理
         res = res.map(item => {
@@ -79,24 +83,26 @@ Page({
     // 存入完成题数及错题数
     if (submitted) doneMax++;
     if (doneMax > this.data.total) doneMax = this.data.total;
-    wx.setStorageSync('cnt_done_' + this.data.chapterId, doneMax.toString());
-    wx.setStorageSync('cnt_wrong_' + this.data.chapterId, this.data.wrong.toString());
+    wx.setStorageSync('cnt_done_' + chapter._id, doneMax.toString());
+    wx.setStorageSync('cnt_wrong_' + chapter._id, this.data.wrong.toString());
   },
   onShow: function() {
     // 初始化全局变量
     index = 0;
     pending = false;
     submitted = false;
+    chapter = app.getChapter();
   },
   checkboxChange: function(e) {
-    this.setData({ answer: e.detail.value });
+    answer = e.detail.value;
+    if (this.data.problem.answer.length === 1) this.submit();
   },
   submit: function() {
     if (!this.data.problem._id) return;
     if (pending || submitted) return;
     submitted = true;
     // 答案对比
-    var answer1 = this.data.answer;
+    var answer1 = answer;
     var answer2 = this.data.problem.answer;
     answer1.sort();
     answer2.sort();
@@ -137,7 +143,7 @@ Page({
       pending = true;
       var that = this;
       request({
-        url: `api/qbank/problem/prev/${data.chapterId}/${data.done - 1}`,
+        url: `api/qbank/problem/prev/${chapter._id}/${data.done}`,
         success: function(res) {
           res = res.map(item => {
             var choices = item.choices;
@@ -194,7 +200,7 @@ Page({
       var that = this;
 
       request({
-        url: `api/qbank/problem/${data.chapterId}/${data.done + 1}`,
+        url: `api/qbank/problem/${chapter._id}/${data.done + 1}`,
         success: function(res) {
           res = res.map(item => {
             var choices = item.choices;

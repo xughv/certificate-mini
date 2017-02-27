@@ -48,8 +48,6 @@ Page({
     } catch (e) {
       wx.showModal({ title: '错误', content: '选定证书时写入异常' });
     }
-    wx.navigateTo({
-      url: '../index/index'
-    });
+    wx.navigateBack({ delta: 1 });
   }
 })

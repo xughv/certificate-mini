@@ -24,3 +24,8 @@
   width: 94%;
   margin: 8px;
 }
+
+
+button[type="primary"] {
+  background-color: #47c577;
+}

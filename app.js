@@ -44,8 +44,15 @@ App({
   setCategory: function(category) {
     this.globalData.category = category;
   },
+  getChapter: function() {
+    return this.globalData.chapter;
+  },
+  setChapter: function(chapter) {
+    this.globalData.chapter = chapter;
+  },
   globalData: {
     userInfo: null,
-    category: null
+    category: null,
+    chapter: null
   }
 })

@@ -1,5 +1,6 @@
 <scroll-view class="problem-scroll" scroll-y="true">
   <view class="problem-container">
+    <text class="problem-title">{{title}}</text>
     <text class="problem-count">{{done < total ? done+1: total}}/{{total}}</text>
     <image class="problem-image" src="../../images/problem.png"></image>
     <text class="problem-description">{{problem.problem}}</text>

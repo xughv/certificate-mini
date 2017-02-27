@@ -8,8 +8,11 @@ Page({
     chapters: []
   },
   onLoad: function () {
+
+  },
+  onShow: function() {
     var category = app.getCategory();
-    console.log(category);
+    // console.log(category);
     if (!category) {
       wx.navigateTo({
         url: '../categorys/categorys'
@@ -49,22 +52,6 @@ Page({
       }
     });
   },
-  onShow: function() {
-    // console.log('show');
-    var chapters = this.data.chapters.map(item => {
-      var done = wx.getStorageSync('cnt_done_' + item._id);
-      if (!done) done = 0;
-
-      var wrong = wx.getStorageSync('cnt_wrong_' + item._id);
-      if (!wrong) wrong = 0;
-
-      item.done = done;
-      item.rate = Math.floor((1 - wrong / done) * 100);
-      // console.log(done, item.rate );
-      return item;
-    });
-    this.setData({ chapters: chapters });
-  },
   //事件处理函数
   handleWrongClick: function() {
     wx.navigateTo({
@@ -80,10 +67,10 @@ Page({
     if (!e.target.id) return;
     var id = e.target.id, total = 0, chapters = this.data.chapters;
     for (let i = 0; i < chapters.length; ++i) {
-      if (chapters[i]._id === id) total = chapters[i].count;
+      if (chapters[i]._id === id) app.setChapter(chapters[i]);
     }
     wx.navigateTo({
-      url: `../problems/problems?id=${id}&total=${total}`
+      url: `../problems/problems`
     })
   }
 })

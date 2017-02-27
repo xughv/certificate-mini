@@ -9,6 +9,11 @@
   padding-top: 0;
 }
 
+.problem-title {
+  font-size: 13px;
+  color: #aaa;
+}
+
 .problem-count {
   font-size: 13px;
   color: #aaa;
