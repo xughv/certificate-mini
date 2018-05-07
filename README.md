@@ -1,4 +1,4 @@
-# certificate-minapp
+# certificate-mini
 小程序 - 在线题库
 
 后端可以参考下 [xughv/cert](https://github.com/xughv/cert) 中的部分
